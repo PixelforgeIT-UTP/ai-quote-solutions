@@ -29,7 +29,7 @@ export const Navbar = () => {
             <div className="p-2 bg-primary rounded-lg group-hover:bg-accent transition-all">
               <Leaf className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground">EcoClean Solutions</span>
+            <span className="text-xl font-bold text-foreground">Urge to Purge</span>
           </Link>
 
           <div className="hidden lg:flex items-center gap-1">
