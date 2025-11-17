@@ -41,7 +41,7 @@ export default function About() {
           <div className="max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl font-bold mb-6">Our Story</h2>
             <p className="text-lg text-muted-foreground mb-4">
-              Founded in 2010, EcoClean Solutions started with a simple mission: to provide professional waste management services that respect both people and the planet. What began as a small local operation has grown into a trusted name in sustainable junk removal and property maintenance.
+              Founded in 2010, Urge to Purge started with a simple mission: to provide professional waste management services that respect both people and the planet. What began as a small local operation has grown into a trusted name in sustainable junk removal and property maintenance.
             </p>
             <p className="text-lg text-muted-foreground mb-4">
               Over the years, we've helped thousands of families, businesses, and property managers with everything from routine junk removal to sensitive hoarding situations. Through it all, we've maintained our commitment to compassionate service and environmental responsibility.

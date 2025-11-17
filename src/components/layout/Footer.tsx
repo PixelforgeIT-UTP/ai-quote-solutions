@@ -11,7 +11,7 @@ export const Footer = () => {
               <div className="p-2 bg-primary rounded-lg">
                 <Leaf className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-lg font-bold">EcoClean Solutions</span>
+              <span className="text-lg font-bold">Urge to Purge</span>
             </Link>
             <p className="text-sm text-muted-foreground">
               Professional waste management and sustainable junk removal services for a cleaner tomorrow.
@@ -47,7 +47,7 @@ export const Footer = () => {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
-                <span>info@ecoclean.com</span>
+                <span>info@urgetopurge.com</span>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
@@ -58,7 +58,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} EcoClean Solutions. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Urge to Purge. All rights reserved.</p>
         </div>
       </div>
     </footer>

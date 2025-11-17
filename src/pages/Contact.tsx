@@ -107,7 +107,7 @@ export default function Contact() {
                     <Mail className="h-5 w-5 text-primary mt-0.5" />
                     <div>
                       <p className="font-medium">Email</p>
-                      <p className="text-muted-foreground">info@ecoclean.com</p>
+                      <p className="text-muted-foreground">info@urgetopurge.com</p>
                     </div>
                   </div>
 
