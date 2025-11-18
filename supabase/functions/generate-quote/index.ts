@@ -36,55 +36,74 @@ serve(async (req) => {
 
     console.log(`Processing ${images.length} images`);
 
-    // Default price list for waste management services
-    const defaultPriceList = JSON.stringify({
-      "services": {
-        "hoarding_cleanup": {
-          "base_rate": 150,
-          "per_hour": 85,
-          "description": "Hoarding remediation and cleanup"
-        },
-        "junk_removal": {
-          "base_rate": 100,
-          "per_cubic_yard": 75,
-          "description": "General junk and debris removal"
-        },
-        "furniture_removal": {
-          "small_item": 50,
-          "large_item": 100,
-          "description": "Furniture and appliance removal"
-        },
-        "appliance_removal": {
-          "small": 60,
-          "large": 120,
-          "description": "Appliance disposal"
-        },
-        "estate_cleanout": {
-          "base_rate": 200,
-          "per_room": 100,
-          "description": "Complete estate cleanout"
-        },
-        "recycling": {
-          "base_rate": 50,
-          "per_load": 40,
-          "description": "Recycling and eco-friendly disposal"
-        },
-        "hazmat_disposal": {
-          "base_rate": 250,
-          "per_item": 75,
-          "description": "Hazardous material disposal"
-        },
-        "labor": {
-          "per_hour": 75,
-          "minimum_hours": 2,
-          "description": "Additional labor"
-        },
-        "disposal_fees": {
-          "per_ton": 60,
-          "description": "Landfill disposal fees"
+    // Get price list from database
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+    const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
+    
+    const priceListResponse = await fetch(
+      `${SUPABASE_URL}/rest/v1/price_list?select=*`,
+      {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         }
       }
-    });
+    );
+    
+    if (!priceListResponse.ok) {
+      console.error('Failed to fetch price list');
+      return new Response(
+        JSON.stringify({ error: 'Failed to fetch price list' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    const priceListData = await priceListResponse.json();
+    
+    // Convert database format to the format expected by AI server
+    const services: any = {};
+    for (const item of priceListData) {
+      const serviceData: any = {
+        description: item.description || item.service_name
+      };
+      
+      if (item.base_rate) serviceData.base_rate = item.base_rate;
+      if (item.per_hour) serviceData.per_hour = item.per_hour;
+      if (item.per_item) serviceData.per_item = item.per_item;
+      if (item.per_cubic_yard) serviceData.per_cubic_yard = item.per_cubic_yard;
+      if (item.per_room) serviceData.per_room = item.per_room;
+      if (item.per_load) serviceData.per_load = item.per_load;
+      if (item.per_ton) serviceData.per_ton = item.per_ton;
+      if (item.small_item) serviceData.small_item = item.small_item;
+      if (item.large_item) serviceData.large_item = item.large_item;
+      if (item.minimum_hours) serviceData.minimum_hours = item.minimum_hours;
+      
+      services[item.service_key] = serviceData;
+    }
+    
+    const priceList = JSON.stringify({ services });
+    console.log('Price list loaded from database');
+    
+    // Get AI prompt from database
+    const promptResponse = await fetch(
+      `${SUPABASE_URL}/rest/v1/ai_prompts?prompt_key=eq.quote_generation&select=prompt_text`,
+      {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        }
+      }
+    );
+    
+    let promptExtras = 'Company: Urge to Purge - Professional waste management and disposal services. Provide detailed breakdown of items visible and estimated removal costs.';
+    
+    if (promptResponse.ok) {
+      const promptData = await promptResponse.json();
+      if (promptData && promptData.length > 0) {
+        promptExtras = promptData[0].prompt_text;
+        console.log('AI prompt loaded from database');
+      }
+    }
 
     // Create new FormData for the AI server
     const aiFormData = new FormData();
@@ -94,11 +113,11 @@ serve(async (req) => {
       aiFormData.append('images', image);
     }
     
-    // Add price list
-    aiFormData.append('priceList', defaultPriceList);
+    // Add price list from database
+    aiFormData.append('priceList', priceList);
     
-    // Add prompt extras specific to Urge to Purge
-    aiFormData.append('promptExtras', 'Company: Urge to Purge - Professional waste management and disposal services. Provide detailed breakdown of items visible and estimated removal costs.');
+    // Add prompt extras from database
+    aiFormData.append('promptExtras', promptExtras);
 
     // Forward to local AI server
     const aiServerUrl = LOCAL_AI_SERVER_URL.endsWith('/') 
